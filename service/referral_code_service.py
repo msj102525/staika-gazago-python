@@ -18,6 +18,18 @@ from crud.referral_code_crud import (
 # -----------------------------
 #  유틸 함수
 # -----------------------------
+def time_execution(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(
+            f"Execution time for {func.__name__}: {end_time - start_time:.2f} seconds"
+        )
+        return result
+
+    return wrapper
+
 def generate_user_code() -> str:
     """8자리 대문자 랜덤 코드"""
     return "".join(random.choices(string.ascii_uppercase, k=8))
@@ -75,6 +87,7 @@ def update_user_task(user_id: int, bridge_id: int = None, max_retry: int = 3, re
 # -----------------------------
 #  병렬 실행 + tqdm + referral_code 재시도
 # -----------------------------
+@time_execution
 def process_all_users_parallel(max_workers: int = 20, max_referral_retry: int = 3):
     """모든 유저 병렬 처리 + tqdm ETA + referral_code 미입력 재시도"""
     user_ids = get_all_users_with_bridge()
